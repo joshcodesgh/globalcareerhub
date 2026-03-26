@@ -13,6 +13,10 @@ app.use(cors());
 
 // --- Server-Side Job Fetchers ---
 
+app.get('/', (req, res) => {
+    res.send('Global Career Hub API is running successfully!');
+});
+
 async function fetchFindworkJobs() {
     const findworkToken = process.env.FINDWORK_TOKEN;
     if (!findworkToken) return [];

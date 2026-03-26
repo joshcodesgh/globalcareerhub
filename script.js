@@ -6,7 +6,7 @@ const newsContainer = document.getElementById('news-container');
 // Use 'http://localhost:3000' for local development and your production URL for deployment.
 const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
     ? 'http://localhost:3000' 
-    : 'https://gch-backend.onrender.com'; // Replace with your actual Render URL
+    : 'https://globalcarrerhub.up.railway.app'; // Updated to your actual Railway URL
 
 async function loadJobs() {
     if (!jobsContainer) return; // Stop if we are on a page without the jobs list
