@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us | Global Career Hub</title>
+    <meta name="description" content="Get in touch with the Global Career Hub team. We welcome your questions, feedback, and partnership inquiries.">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="manifest" href="manifest.json">
+    <!-- Security: CSP for Contact Page (Allows EmailJS) -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' https: data:; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; font-src 'self' https://cdnjs.cloudflare.com; connect-src 'self' https://api.emailjs.com; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests;">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">GlobalCareerHub</div>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="news.html">News</a></li>
+                <li><a href="jobs.html">Top Jobs</a></li>
+                <li><a href="blog.html">Blog</a></li>
+                <li><a href="resources.html">Resources</a></li>
+                <li><a href="success.html">Success Tips</a></li>
+                <li><a href="donate.html">Support Us</a></li>
+                <li><a href="contact.html">Contact</a></li>
+                <li><a href="index.html#newsletter" class="cta-button">Get Alerts</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h1>Get In Touch</h1>
+            <p>We'd love to hear from you. Send us your questions, feedback, or partnership ideas.</p>
+        </section>
+
+        <div class="contact-container">
+            
+            <!-- Contact Info -->
+            <div class="contact-info">
+                <h3 class="section-title" style="font-size: 1.5rem;">Contact Information</h3>
+                <p>For general inquiries, please use the form. For urgent matters, you can reach us via the details below.</p>
+                <div class="contact-info-details">
+                    <p><i class="fas fa-phone"></i> <a href="tel:+233542084938">+233 54 208 4938</a></p>
+                    <p><i class="fab fa-whatsapp"></i> <a href="https://wa.me/233206433697" target="_blank">+233 20 643 3697</a></p>
+                    <p><i class="fas fa-map-marker-alt"></i> Accra, Ghana (Remote Team)</p>
+                </div>
+            </div>
+
+            <!-- Contact Form -->
+            <form id="contact-form" class="post-job-form contact-form-wrapper">
+                <h3 class="section-title text-center mb-30" style="font-size: 1.5rem;">Send Us a Message</h3>
+                
+                <div class="form-group">
+                    <label for="name">Your Name</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Your Email</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="message">Message</label>
+                    <textarea id="message" name="message" required rows="5"></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; font-size: 1.1rem;">Send Message</button>
+            </form>
+
+        </div>
+    </main>
+
+    <!-- Success Modal -->
+    <div id="success-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <i class="fas fa-check-circle" style="color: #28a745; font-size: 3rem; margin-bottom: 15px;"></i>
+            <h2>Message Sent!</h2>
+            <p>Thank you for reaching out. We'll get back to you shortly.</p>
+        </div>
+    </div>
+
+    <!-- You can copy the footer from index.html and paste it here -->
+    <footer>
+        <div class="footer-container">
+            <div class="footer-col">
+                <h3>GlobalCareerHub</h3>
+                <p>Connecting talent with opportunity. Your trusted source for legitimate online jobs and remote work resources.</p>
+                <div class="mt-15 footer-contact-links">
+                    <p><a href="tel:+233542084938"><i class="fas fa-phone"></i>+233 54 208 4938</a></p>
+                    <p><a href="tel:+233550946888"><i class="fas fa-phone"></i>+233 55 094 6888</a></p>
+                    <p><a href="https://wa.me/233206433697" target="_blank"><i class="fab fa-whatsapp"></i>+233 20 643 3697</a></p>
+                    <p class="mt-15 footer-support-link"><a href="donate.html"><i class="fas fa-donate"></i>Support the Hub</a></p>
+                </div>
+            </div>
+            <div class="footer-col">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="jobs.html">Browse Jobs</a></li>
+                    <li><a href="blog.html">Career Blog</a></li>
+                    <li><a href="news.html">Tech News</a></li>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="faq.html">FAQs</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h3>Resources</h3>
+                <ul>
+                    <li><a href="success.html">Success Tips</a></li>
+                    <li><a href="resources.html">Learning Tools</a></li>
+                    <li><a href="privacy.html">Privacy Policy</a></li>
+                    <li><a href="terms.html">Terms of Service</a></li>
+                    <li><a href="contact.html">Contact Us</a></li>
+                    <li><a href="sitemap.html">Sitemap</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h3>Stay Updated</h3>
+                <p>Subscribe to our newsletter for the latest job alerts.</p>
+                <form action="https://formspree.io/f/xrbyoplr" method="POST" class="newsletter-form mt-15">
+                    <input type="email" name="email" placeholder="Enter email" required>
+                    <button type="submit">Go</button>
+                </form>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 Global Career Hub. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

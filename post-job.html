@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post a Job | Global Career Hub</title>
+    <meta name="description" content="Post a remote job on Global Career Hub. Reach thousands of qualified candidates in Africa and worldwide.">
+    <link rel="stylesheet" href="style.css">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">GlobalCareerHub</div>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="jobs.html">Top Jobs</a></li>
+                <li><a href="post-job.html" style="color: #ffd700;">Post a Job</a></li>
+                <li><a href="blog.html">Blog</a></li>
+                <li><a href="success.html">Success Tips</a></li>
+                <li><a href="donate.html">Support Us</a></li>
+                <li><a href="index.html#newsletter" class="cta-button">Get Alerts</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h1>Hire Top Talent</h1>
+            <p>Reach thousands of qualified remote workers in Ghana and beyond.</p>
+        </section>
+
+        <div class="container" style="padding: 40px 20px;">
+            
+            <!-- Pricing Section -->
+            <div class="price-card" style="max-width: 700px; margin: 0 auto 40px auto;">
+                <h2>Standard Job Listing</h2>
+                <div class="price-amount">$49 <span style="font-size: 1rem; color: #666; font-weight: normal;">/ post</span></div>
+                <ul style="list-style: none; padding: 0; margin: 20px 0; color: #444;">
+                    <li><i class="fas fa-check" style="color: green; margin-right: 10px;"></i> Listed for 30 days</li>
+                    <li><i class="fas fa-check" style="color: green; margin-right: 10px;"></i> Featured in weekly newsletter</li>
+                    <li><i class="fas fa-check" style="color: green; margin-right: 10px;"></i> Shared on social media</li>
+                </ul>
+            </div>
+
+            <!-- Job Submission Form -->
+            <form id="postJobForm" class="post-job-form" action="https://formspree.io/f/xrbyoplr" method="POST">
+                <input type="hidden" name="payment_reference" id="payment_reference">
+                <h3 style="text-align: center; margin-bottom: 30px; color: #004d40;">Job Details</h3>
+                
+                <div class="form-group">
+                    <label>Company Name</label>
+                    <input type="text" name="company" required placeholder="e.g. Tech Solutions Ltd">
+                </div>
+
+                <div class="form-group">
+                    <label>Job Title</label>
+                    <input type="text" name="title" required placeholder="e.g. Senior Customer Support">
+                </div>
+
+                <div class="form-group">
+                    <label>Job Type</label>
+                    <select name="type">
+                        <option value="Full Time">Full Time</option>
+                        <option value="Part Time">Part Time</option>
+                        <option value="Contract">Contract / Freelance</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Application Link or Email</label>
+                    <input type="text" name="application_url" required placeholder="Where should candidates apply?">
+                </div>
+
+                <div class="form-group">
+                    <label>Job Description</label>
+                    <textarea name="description" required placeholder="Describe the role, requirements, and benefits..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Your Email (for invoice)</label>
+                    <input type="email" name="_replyto" required placeholder="We will send the payment link here">
+                </div>
+
+                <button type="submit" class="btn btn-hubtel" style="width: 100%; border: none; font-size: 1.1rem;">Submit & Pay via Hubtel</button>
+                <p style="text-align: center; margin-top: 15px; font-size: 0.9rem; color: #666;">You will be redirected to Hubtel to complete the 800 GHS payment.</p>
+            </form>
+
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-container">
+            <div class="footer-col">
+                <h3>GlobalCareerHub</h3>
+                <p>Connecting talent with opportunity.</p>
+                <p style="margin: 15px 0 5px 0; color: #ffd700; font-weight: bold;"><a href="donate.html" style="color: #ffd700; text-decoration: none;"><i class="fas fa-donate" style="margin-right: 8px;"></i>Support the Hub</a></p>
+            </div>
+            <div class="footer-col">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="contact.html">Contact Us</a></li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Logic: Submit form to Formspree first, then redirect to Hubtel
+        const paymentForm = document.getElementById('postJobForm');
+        paymentForm.addEventListener('submit', handleJobPost, false);
+
+        async function handleJobPost(e) {
+            e.preventDefault();
+            
+            const button = paymentForm.querySelector('button');
+            const originalText = button.textContent;
+            button.textContent = "Processing...";
+            button.disabled = true;
+
+            // 1. Submit data to Formspree using AJAX
+            try {
+                const response = await fetch(paymentForm.action, {
+                    method: 'POST',
+                    body: new FormData(paymentForm),
+                    headers: { 'Accept': 'application/json' }
+                });
+
+                if (response.ok) {
+                    // 2. On success, redirect to Hubtel
+                    // IMPORTANT: Replace with your actual Hubtel Payment Link
+                    window.location.href = "https://hubtel.com/pay/YOUR_MERCHANT_ID";
+                } else {
+                    alert("There was an error submitting the form. Please try again.");
+                    button.textContent = originalText;
+                    button.disabled = false;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert("Network error. Please check your connection.");
+                button.textContent = originalText;
+                button.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>
