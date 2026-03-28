@@ -8,6 +8,8 @@ const FINDWORK_TOKEN = '69d926c1efac94d21b71312a139f02230ffe6127';
 const WORLD_NEWS_API_KEY = '3aa0ad6044cc4351b2cdd966f0015659';
 const REQUEST_TIMEOUT = 30000; // Increased to 30 seconds for slow proxies
 
+const PROXY_URL = 'https://api.allorigins.win/raw?url=';
+
 const loadingPlaceholder = `
         <div id="loading-notice" style="text-align:center; padding: 20px 20px 0 20px;">
             <p style="font-size: 1.2rem; color: #333;">Loading latest jobs from our sources...</p>
@@ -121,7 +123,7 @@ async function fetchFindwork() {
         const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
         
         const targetUrl = 'https://findwork.dev/api/jobs/';
-        const resp = await fetch(`https://corsproxy.io/?${encodeURIComponent(targetUrl)}`, {
+        const resp = await fetch(`${PROXY_URL}${encodeURIComponent(targetUrl)}`, {
             headers: { 'Authorization': `Token ${FINDWORK_TOKEN}` },
             signal: controller.signal
         });
@@ -145,7 +147,7 @@ async function fetchRemotive() {
         const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
 
         const targetUrl = 'https://remotive.com/api/remote-jobs';
-        const resp = await fetch(`https://corsproxy.io/?${encodeURIComponent(targetUrl)}`, { signal: controller.signal });
+        const resp = await fetch(`${PROXY_URL}${encodeURIComponent(targetUrl)}`, { signal: controller.signal });
         clearTimeout(timeoutId);
         const data = await resp.json();
         return data.jobs.map(job => ({
@@ -166,7 +168,7 @@ async function fetchRemoteOK() {
         const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
 
         const targetUrl = 'https://remoteok.com/api';
-        const resp = await fetch(`https://corsproxy.io/?${encodeURIComponent(targetUrl)}`, { signal: controller.signal });
+        const resp = await fetch(`${PROXY_URL}${encodeURIComponent(targetUrl)}`, { signal: controller.signal });
         clearTimeout(timeoutId);
         const data = await resp.json();
         return data.slice(1).map(job => ({
@@ -184,6 +186,9 @@ async function fetchRemoteOK() {
 // --- Job Renderer ---
 function renderJobs(allJobs, container = jobsContainer) {
     if (!container) return;
+    
+    const fragment = document.createDocumentFragment();
+
     allJobs.forEach(job => {
         const card = document.createElement('div');
         card.className = 'job-card';
@@ -219,9 +224,11 @@ function renderJobs(allJobs, container = jobsContainer) {
         card.appendChild(createDetail('Type', job.type));
         card.appendChild(createDetail('Salary', job.salary));
         card.appendChild(link);
-
-        container.appendChild(card);
+        
+        fragment.appendChild(card);
     });
+    
+    container.appendChild(fragment);
 }
 
 // Logic: Load News from World News API
@@ -242,7 +249,7 @@ async function loadNews() {
 
         // Reduced count to 10 to save API points and improve speed
         const targetUrl = `https://api.worldnewsapi.com/search-news?text=remote+work+tech&language=en&number=50&api-key=${WORLD_NEWS_API_KEY}`;
-        const resp = await fetch(`https://corsproxy.io/?${encodeURIComponent(targetUrl)}`, { signal: controller.signal });
+        const resp = await fetch(`${PROXY_URL}${encodeURIComponent(targetUrl)}`, { signal: controller.signal });
         clearTimeout(timeoutId);
 
         if (resp.status === 401) throw new Error("Invalid API Key");
