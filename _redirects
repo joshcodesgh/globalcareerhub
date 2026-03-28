@@ -1,0 +1,5 @@
+# This file ensures users can visit /jobs instead of /jobs.html
+/news       /news.html    200
+/jobs       /jobs.html    200
+/blog       /blog.html    200
+/resources  /resources.html 200

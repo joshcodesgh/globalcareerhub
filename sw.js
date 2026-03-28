@@ -25,6 +25,22 @@ self.addEventListener('install', (e) => {
     );
 });
 
+self.addEventListener('activate', (e) => {
+    // This ensures that when you update CACHE_NAME (e.g., to 'gch-v2'), 
+    // the old cache is deleted immediately.
+    e.waitUntil(
+        caches.keys().then((cacheNames) => {
+            return Promise.all(
+                cacheNames.map((cache) => {
+                    if (cache !== CACHE_NAME) {
+                        return caches.delete(cache);
+                    }
+                })
+            );
+        })
+    );
+});
+
 self.addEventListener('fetch', (e) => {
     // Skip intercepting requests to external APIs (CORS proxy)
     if (!e.request.url.startsWith(self.location.origin)) return;
