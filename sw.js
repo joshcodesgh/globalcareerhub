@@ -1,4 +1,4 @@
-const CACHE_NAME = 'gch-v3';
+const CACHE_NAME = 'gch-v4';
 const ASSETS = [
     '/',
     '/index.html',
@@ -21,11 +21,13 @@ const ASSETS = [
 
 self.addEventListener('install', (e) => {
     e.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
+        caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS)).then(() => self.skipWaiting())
     );
 });
 
 self.addEventListener('activate', (e) => {
+    // Take control of all pages immediately
+    e.waitUntil(clients.claim());
     // This ensures that when you update CACHE_NAME (e.g., to 'gch-v2'), 
     // the old cache is deleted immediately.
     e.waitUntil(
