@@ -8,7 +8,26 @@ const FINDWORK_TOKEN = '69d926c1efac94d21b71312a139f02230ffe6127';
 const WORLD_NEWS_API_KEY = '3aa0ad6044cc4351b2cdd966f0015659';
 const REQUEST_TIMEOUT = 30000; // Increased to 30 seconds for slow proxies
 
-const PROXY_URL = 'https://api.allorigins.win/raw?url=';
+// Switching to corsproxy.io as primary due to AllOrigins 500 errors
+const PROXY_URL = 'https://corsproxy.io/?';
+
+/**
+ * World-class helper for resilient fetching with retries
+ * Useful for overcoming intermittent protocol errors like ERR_QUIC_PROTOCOL_ERROR
+ */
+async function fetchWithRetry(url, options = {}, retries = 2) {
+    try {
+        const response = await fetch(url, options);
+        if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
+        return response;
+    } catch (err) {
+        if (retries > 0) {
+            console.warn(`Fetch failed, retrying... (${retries} left). Error: ${err.message}`);
+            return fetchWithRetry(url, options, retries - 1);
+        }
+        throw err;
+    }
+}
 
 const loadingPlaceholder = `
         <div id="loading-notice" style="text-align:center; padding: 20px 20px 0 20px;">
@@ -123,7 +142,7 @@ async function fetchFindwork() {
         const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
         
         const targetUrl = 'https://findwork.dev/api/jobs/';
-        const resp = await fetch(`${PROXY_URL}${encodeURIComponent(targetUrl)}`, {
+        const resp = await fetchWithRetry(`${PROXY_URL}${encodeURIComponent(targetUrl)}`, {
             headers: { 'Authorization': `Token ${FINDWORK_TOKEN}` },
             signal: controller.signal
         });
@@ -147,7 +166,9 @@ async function fetchRemotive() {
         const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
 
         const targetUrl = 'https://remotive.com/api/remote-jobs';
-        const resp = await fetch(`${PROXY_URL}${encodeURIComponent(targetUrl)}`, { signal: controller.signal });
+        const resp = await fetchWithRetry(`${PROXY_URL}${encodeURIComponent(targetUrl)}`, { 
+            signal: controller.signal 
+        });
         clearTimeout(timeoutId);
         const data = await resp.json();
         return data.jobs.map(job => ({
@@ -168,7 +189,9 @@ async function fetchRemoteOK() {
         const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
 
         const targetUrl = 'https://remoteok.com/api';
-        const resp = await fetch(`${PROXY_URL}${encodeURIComponent(targetUrl)}`, { signal: controller.signal });
+        const resp = await fetchWithRetry(`${PROXY_URL}${encodeURIComponent(targetUrl)}`, { 
+            signal: controller.signal 
+        });
         clearTimeout(timeoutId);
         const data = await resp.json();
         return data.slice(1).map(job => ({
@@ -241,15 +264,42 @@ async function loadNews() {
         return;
     }
 
-    newsContainer.innerHTML = '<p style="text-align:center;">Loading latest news...</p>';
+    // --- World-Class UX: Load from Cache First ---
+    const cachedNews = localStorage.getItem('gch_news_cache');
+    if (cachedNews) {
+        try {
+            const parsedCache = JSON.parse(cachedNews);
+            // Only use cache if it's less than 1 hour old
+            if (Date.now() - parsedCache.timestamp < 3600000) {
+                renderNewsUI(parsedCache.data);
+                console.log("Loaded news from local cache.");
+            }
+        } catch (e) {
+            console.warn("Failed to parse news cache", e);
+        }
+    }
+
+    // Show spinner only if there's no cache to show
+    if (!newsContainer.innerHTML || newsContainer.innerHTML.includes('loading-spinner')) {
+        newsContainer.innerHTML = `
+            <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px;">
+                <div class="loading-spinner" style="width: 45px; height: 45px; border-width: 5px; margin-bottom: 20px;"></div>
+                <p style="color: var(--text-light); font-size: 1.1rem; font-weight: 500;">Fetching world-class career insights...</p>
+            </div>
+        `;
+    }
 
     try {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
 
-        // Reduced count to 10 to save API points and improve speed
-        const targetUrl = `https://api.worldnewsapi.com/search-news?text=remote+work+tech&language=en&number=50&api-key=${WORLD_NEWS_API_KEY}`;
-        const resp = await fetch(`${PROXY_URL}${encodeURIComponent(targetUrl)}`, { signal: controller.signal });
+        // Optimization: Reduce number to 20 for faster proxy transfer
+        const targetUrl = `https://api.worldnewsapi.com/search-news?text=remote+work+tech&language=en&number=20&api-key=${WORLD_NEWS_API_KEY}`;
+        
+        // Using the retry helper to handle network/QUIC snags
+        const resp = await fetchWithRetry(`${PROXY_URL}${encodeURIComponent(targetUrl)}`, { 
+            signal: controller.signal 
+        });
         clearTimeout(timeoutId);
 
         if (resp.status === 401) throw new Error("Invalid API Key");
@@ -269,6 +319,7 @@ async function loadNews() {
         const grid = document.createElement('div');
         grid.style.cssText = "display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;";
 
+        const fragment = document.createDocumentFragment();
         data.news.forEach(article => {
             const card = document.createElement('div');
             card.className = 'job-card'; // Reusing job-card style for consistency
@@ -300,9 +351,10 @@ async function loadNews() {
             card.appendChild(h3);
             card.appendChild(p);
             card.appendChild(link);
-            grid.appendChild(card);
+            fragment.appendChild(card);
         });
         
+        grid.appendChild(fragment);
         newsContainer.appendChild(grid);
 
     } catch (error) {
@@ -319,6 +371,56 @@ async function loadNews() {
 
         newsContainer.innerHTML = `<p style="text-align:center; color: #666; padding: 20px; border: 1px dashed #ccc; border-radius: 8px;">${userMessage}</p>`;
     }
+}
+
+/**
+ * Separated UI Rendering Logic for News
+ * Allows for re-use between cache loading and fresh API results
+ */
+function renderNewsUI(newsItems) {
+    if (!newsContainer) return;
+    newsContainer.innerHTML = '';
+
+    const grid = document.createElement('div');
+    grid.style.cssText = "display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;";
+
+    const fragment = document.createDocumentFragment();
+    newsItems.forEach(article => {
+        const card = document.createElement('div');
+        card.className = 'job-card';
+        card.style.display = 'flex';
+        card.style.flexDirection = 'column';
+
+        if (article.image) {
+            const img = document.createElement('img');
+            img.src = article.image;
+            img.style.cssText = "width:100%; height:150px; object-fit:cover; border-radius:4px; margin-bottom:10px;";
+            img.onerror = () => img.style.display = 'none';
+            card.appendChild(img);
+        }
+
+        const h3 = document.createElement('h3');
+        h3.textContent = article.title;
+        
+        const p = document.createElement('p');
+        p.textContent = article.text ? article.text.substring(0, 100) + '...' : 'Click to read more.';
+        
+        const link = document.createElement('a');
+        link.href = article.url;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        link.className = "apply-btn";
+        link.textContent = "Read Article";
+        link.style.marginTop = "auto";
+
+        card.appendChild(h3);
+        card.appendChild(p);
+        card.appendChild(link);
+        fragment.appendChild(card);
+    });
+    
+    grid.appendChild(fragment);
+    newsContainer.appendChild(grid);
 }
 
 // Cookie Consent Logic
